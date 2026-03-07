@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package dashboard.services.v1;
+
+option go_package = "github.com/MediStatTech/dashboard-client/pb/go/services/v1";
+
+import "models/v1/diseas_dash.proto";
+
+// =====================
+// DiseasService
+// =====================
+service DiseasService {
+  rpc DiseasGet(DiseasGetRequest) returns (DiseasGetReply);
+}
+
+// =====================
+// DiseasGet
+// =====================
+message DiseasGetRequest {}
+
+message DiseasGetReply {
+  repeated dashboard.models.v1.Diseas diseases = 1;
+}
