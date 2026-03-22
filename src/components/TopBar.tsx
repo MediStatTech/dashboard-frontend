@@ -29,17 +29,31 @@ export default function TopBar() {
           MediStat
         </h1>
       </div>
-      {staff && (
+      <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate('/doctor')}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 text-sm text-gray-700 hover:bg-green-100 hover:text-green-700 transition-all duration-200 shadow-sm"
+          onClick={() => navigate('/patients')}
+          className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 transition-all duration-200"
         >
-          <span className="w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-semibold shadow-inner">
-            {staff.firstName[0]}{staff.lastName[0]}
-          </span>
-          Dr. {staff.firstName} {staff.lastName}
+          Patients
         </button>
-      )}
+        <button
+          onClick={() => navigate('/rooms')}
+          className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 transition-all duration-200"
+        >
+          Rooms
+        </button>
+        {staff && (
+          <button
+            onClick={() => navigate('/doctor')}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 text-sm text-gray-700 hover:bg-green-100 hover:text-green-700 transition-all duration-200 shadow-sm"
+          >
+            <span className="w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-semibold shadow-inner">
+              {staff.firstName[0]}{staff.lastName[0]}
+            </span>
+            Dr. {staff.firstName} {staff.lastName}
+          </button>
+        )}
+      </div>
     </header>
   );
 }

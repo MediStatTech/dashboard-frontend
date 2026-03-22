@@ -92,3 +92,59 @@ export interface PatientCreate {
   address: CreateAddress;
   diseas_ids: string[];
 }
+
+// =====================================================
+// Room Service types
+// TODO: Replace with proto-generated types when room-service backend is ready
+// Proto file: proto/models/v1/room_dash.proto
+// =====================================================
+
+export interface EquipmentMetric {
+  metric_id: string;
+  value: number;
+  unit_symbol: string;
+  created_at: string;
+}
+
+export interface Equipment {
+  equipment_id: string;
+  name: string;
+  code: string;
+  equipment_type: string; // 'ventilator' | 'infusion_pump' | 'cardiac_monitor' | 'oxygen_concentrator'
+  unit_symbol: string;
+  metric_name: string;
+  min_value: number;
+  max_value: number;
+  status: string;
+  metrics: EquipmentMetric[];
+}
+
+export interface RoomPatient {
+  patient_id: string;
+  first_name: string;
+  last_name: string;
+  status: string;
+  admitted_at: string;
+}
+
+export interface RoomListItem {
+  room_id: string;
+  number: string;
+  floor: number;
+  department: string;
+  room_type: string; // 'icu' | 'general' | 'surgery' | 'recovery'
+  status: string;    // 'free' | 'occupied' | 'maintenance'
+  patient_name?: string;
+  equipment_count: number;
+}
+
+export interface RoomRead {
+  room_id: string;
+  number: string;
+  floor: number;
+  department: string;
+  room_type: string;
+  status: string;
+  patient?: RoomPatient;
+  equipment: Equipment[];
+}
