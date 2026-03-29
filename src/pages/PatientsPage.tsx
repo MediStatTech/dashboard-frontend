@@ -7,9 +7,11 @@ import { patientClient } from '../api/client';
 import { Patient_CreateSchema } from '../gen/models/v1/patient_dash_pb';
 import type { Patient_ListItem } from '../gen/models/v1/patient_dash_pb';
 import type { PatientCreate } from '../types';
+import { useLocale } from '../i18n/useLocale';
 import mainBg from '../assets/main.png';
 
 export default function PatientsPage() {
+  const { t } = useLocale();
   const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient_ListItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -65,12 +67,12 @@ export default function PatientsPage() {
       <TopBar />
       <main className="max-w-5xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-800 drop-shadow-sm">Patients</h2>
+          <h2 className="text-xl font-bold text-gray-800 drop-shadow-sm">{t.patients.title}</h2>
           <button
             onClick={() => setModalOpen(true)}
             className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-500 rounded-lg hover:from-green-700 hover:to-green-600 shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
           >
-            + Add Patient
+            + {t.patients.add}
           </button>
         </div>
 
@@ -82,10 +84,10 @@ export default function PatientsPage() {
           <table className="w-full text-sm text-left">
             <thead className="bg-green-50/80 text-gray-500 uppercase text-xs">
               <tr>
-                <th className="px-5 py-3.5 font-semibold">Name</th>
-                <th className="px-5 py-3.5 font-semibold">Gender</th>
-                <th className="px-5 py-3.5 font-semibold">Date of Birth</th>
-                <th className="px-5 py-3.5 font-semibold">Status</th>
+                <th className="px-5 py-3.5 font-semibold">{t.patients.name}</th>
+                <th className="px-5 py-3.5 font-semibold">{t.patients.gender}</th>
+                <th className="px-5 py-3.5 font-semibold">{t.patients.dob}</th>
+                <th className="px-5 py-3.5 font-semibold">{t.patients.status}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100/80">

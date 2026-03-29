@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { staffClient } from '../api/client';
 import type { Staff_Read } from '../gen/models/v1/staff_dash_pb';
+import { useLocale } from '../i18n/useLocale';
 import icon from '../assets/medistat_icon_transparent.png';
 
 export default function TopBar() {
   const navigate = useNavigate();
   const [staff, setStaff] = useState<Staff_Read | null>(null);
+  const { lang, toggleLang } = useLocale();
 
   useEffect(() => {
     staffClient.staffRetrieve({}).then((res) => {
@@ -31,16 +33,10 @@ export default function TopBar() {
       </div>
       <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate('/patients')}
-          className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 transition-all duration-200"
+          onClick={toggleLang}
+          className="px-2.5 py-1 rounded-full border border-green-300 text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors duration-200"
         >
-          Patients
-        </button>
-        <button
-          onClick={() => navigate('/rooms')}
-          className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 transition-all duration-200"
-        >
-          Rooms
+          {lang === 'ua' ? 'EN' : 'UA'}
         </button>
         {staff && (
           <button

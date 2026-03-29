@@ -7,9 +7,11 @@ import { staffClient, patientClient } from '../api/client';
 import { Patient_CreateSchema } from '../gen/models/v1/patient_dash_pb';
 import type { Staff_Read } from '../gen/models/v1/staff_dash_pb';
 import type { PatientCreate } from '../types';
+import { useLocale } from '../i18n/useLocale';
 import mainBg from '../assets/main.png';
 
 export default function DoctorProfilePage() {
+  const { t } = useLocale();
   const navigate = useNavigate();
   const [staff, setStaff] = useState<Staff_Read | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -60,7 +62,7 @@ export default function DoctorProfilePage() {
           onClick={() => navigate('/patients')}
           className="text-sm text-green-600 hover:text-green-800 font-medium mb-5 inline-flex items-center gap-1 transition-colors"
         >
-          &larr; Back to Patients
+          &larr; {t.doctor.backToPatients}
         </button>
 
         {error && (
@@ -86,11 +88,11 @@ export default function DoctorProfilePage() {
 
             <div className="grid grid-cols-2 gap-4 text-sm mb-8">
               <div className="bg-gray-50/80 rounded-lg p-4">
-                <span className="text-gray-400 text-xs block mb-1">Email</span>
+                <span className="text-gray-400 text-xs block mb-1">{t.doctor.email}</span>
                 <span className="text-gray-700 font-medium">{staff.email}</span>
               </div>
               <div className="bg-gray-50/80 rounded-lg p-4">
-                <span className="text-gray-400 text-xs block mb-1">Status</span>
+                <span className="text-gray-400 text-xs block mb-1">{t.doctor.status}</span>
                 <span
                   className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm ${
                     staff.status === 'active'
@@ -103,7 +105,7 @@ export default function DoctorProfilePage() {
               </div>
               {staff.position && (
                 <div className="bg-gray-50/80 rounded-lg p-4">
-                  <span className="text-gray-400 text-xs block mb-1">Position</span>
+                  <span className="text-gray-400 text-xs block mb-1">{t.doctor.position}</span>
                   <span className="text-gray-700 font-medium">{staff.position.name}</span>
                 </div>
               )}
@@ -113,7 +115,7 @@ export default function DoctorProfilePage() {
               onClick={() => setModalOpen(true)}
               className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-500 rounded-lg hover:from-green-700 hover:to-green-600 shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
             >
-              + Add Patient
+              + {t.doctor.addPatient}
             </button>
           </div>
         )}

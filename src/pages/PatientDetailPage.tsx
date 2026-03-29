@@ -12,6 +12,7 @@ import {
 import TopBar from '../components/TopBar';
 import { patientClient } from '../api/client';
 import type { Patient_Read } from '../gen/models/v1/patient_dash_pb';
+import { useLocale } from '../i18n/useLocale';
 import mainBg from '../assets/main.png';
 
 const CHART_COLORS = [
@@ -24,6 +25,7 @@ const CHART_COLORS = [
 export default function PatientDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useLocale();
   const [patient, setPatient] = useState<Patient_Read | null>(null);
   const [error, setError] = useState('');
 
@@ -63,7 +65,7 @@ export default function PatientDetailPage() {
       <div className="min-h-screen bg-cover bg-center bg-fixed" style={{ backgroundImage: `url(${mainBg})` }}>
         <TopBar />
         <main className="max-w-5xl mx-auto px-6 py-6">
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-gray-500">{t.patientDetail.loading}</p>
         </main>
       </div>
     );
@@ -77,7 +79,7 @@ export default function PatientDetailPage() {
           onClick={() => navigate('/patients')}
           className="text-sm text-green-600 hover:text-green-800 font-medium mb-5 inline-flex items-center gap-1 transition-colors"
         >
-          &larr; Back to Patients
+          &larr; {t.patientDetail.back}
         </button>
 
         <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 mb-5 border border-white/50">
@@ -116,14 +118,14 @@ export default function PatientDetailPage() {
         <div className="grid grid-cols-2 gap-5 mb-5">
           {patient.contactInfo && (
             <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-5 border border-white/50 hover:shadow-xl transition-shadow duration-200">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Contact</h3>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">{t.patientDetail.contact}</h3>
               <p className="text-sm text-gray-700 font-medium">{patient.contactInfo.phone}</p>
               <p className="text-sm text-gray-500 mt-1">{patient.contactInfo.email}</p>
             </div>
           )}
           {patient.address && (
             <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-5 border border-white/50 hover:shadow-xl transition-shadow duration-200">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Address</h3>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">{t.patientDetail.address}</h3>
               <p className="text-sm text-gray-700 font-medium">{patient.address.line1}</p>
               <p className="text-sm text-gray-500 mt-1">
                 {patient.address.city}, {patient.address.state}
@@ -134,7 +136,7 @@ export default function PatientDetailPage() {
 
         {patient.diseases.length > 0 && (
           <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-5 mb-5 border border-white/50">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Diseases</h3>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">{t.patientDetail.diseases}</h3>
             <div className="flex flex-wrap gap-2">
               {patient.diseases.map((d) => (
                 <span
