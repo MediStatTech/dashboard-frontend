@@ -8,10 +8,11 @@ import { Patient_CreateSchema } from '../gen/models/v1/patient_dash_pb';
 import type { Patient_ListItem } from '../gen/models/v1/patient_dash_pb';
 import type { PatientCreate } from '../types';
 import { useLocale } from '../i18n/useLocale';
+import { statusBadgeClasses, statusRowClasses, statusDotClass, statusLabel } from '../utils/patientStatus';
 import mainBg from '../assets/main.png';
 
 export default function PatientsPage() {
-  const { t } = useLocale();
+  const { t, lang } = useLocale();
   const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient_ListItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -94,23 +95,20 @@ export default function PatientsPage() {
               {patients.map((p) => (
                 <tr
                   key={p.patientId}
-                  className="hover:bg-green-50/50 cursor-pointer transition-all duration-150"
+                  className={`cursor-pointer transition-all duration-150 ${statusRowClasses(p.status)}`}
                   onClick={() => navigate(`/patients/${p.patientId}`)}
                 >
                   <td className="px-5 py-4 font-medium text-gray-800">
-                    {p.firstName} {p.lastName}
+                    <span className="inline-flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${statusDotClass(p.status)}`} />
+                      {p.firstName} {p.lastName}
+                    </span>
                   </td>
                   <td className="px-5 py-4 text-gray-600">{p.gender}</td>
                   <td className="px-5 py-4 text-gray-600">{p.dob}</td>
                   <td className="px-5 py-4">
-                    <span
-                      className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm ${
-                        p.status === 'active'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}
-                    >
-                      {p.status}
+                    <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm ${statusBadgeClasses(p.status)}`}>
+                      {statusLabel(p.status, lang)}
                     </span>
                   </td>
                 </tr>

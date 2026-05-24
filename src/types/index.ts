@@ -46,10 +46,29 @@ export interface Diseas {
   code: string;
 }
 
-export interface Metric {
+export interface MetricType {
+  metric_type_id: string;
+  sensor_id: string;
+  code: string;
+  name: string;
+  symbol: string;
+  min_value: number;
+  max_value: number;
+}
+
+export interface MeasurementComponent {
+  metric_type_id: string;
+  code: string;
+  name: string;
   value: number;
   symbol: string;
+}
+
+export interface Measurement {
+  sensor_id: string;
+  patient_id: string;
   created_at: string;
+  components: MeasurementComponent[];
 }
 
 export interface Sensor {
@@ -58,7 +77,8 @@ export interface Sensor {
   code: string;
   symbol: string;
   status: string;
-  metrics: Metric[];
+  metric_types: MetricType[];
+  measurements: Measurement[];
 }
 
 export interface PatientListItem {
@@ -93,12 +113,6 @@ export interface PatientCreate {
   diseas_ids: string[];
 }
 
-// =====================================================
-// Room Service types
-// TODO: Replace with proto-generated types when room-service backend is ready
-// Proto file: proto/models/v1/room_dash.proto
-// =====================================================
-
 export interface EquipmentMetric {
   metric_id: string;
   value: number;
@@ -110,7 +124,7 @@ export interface Equipment {
   equipment_id: string;
   name: string;
   code: string;
-  equipment_type: string; // 'ventilator' | 'infusion_pump' | 'cardiac_monitor' | 'oxygen_concentrator'
+  equipment_type: string;
   unit_symbol: string;
   metric_name: string;
   min_value: number;
@@ -132,8 +146,8 @@ export interface RoomListItem {
   number: string;
   floor: number;
   department: string;
-  room_type: string; // 'icu' | 'general' | 'surgery' | 'recovery'
-  status: string;    // 'free' | 'occupied' | 'maintenance'
+  room_type: string;
+  status: string;
   patient_name?: string;
   equipment_count: number;
 }

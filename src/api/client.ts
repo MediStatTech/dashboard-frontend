@@ -5,6 +5,7 @@ import { AuthService } from '../gen/services/v1/auth_dash_pb';
 import { PatientService } from '../gen/services/v1/patient_dash_pb';
 import { StaffService } from '../gen/services/v1/staff_dash_pb';
 import { DiseasService } from '../gen/services/v1/diseas_dash_pb';
+import { MeasurementService } from '../gen/services/v1/measurement_dash_pb';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -25,3 +26,4 @@ export const authClient = createClient(AuthService, transport);
 export const patientClient = createClient(PatientService, transport);
 export const staffClient = createClient(StaffService, transport);
 export const diseasClient = createClient(DiseasService, transport);
+export const measurementClient = createClient(MeasurementService, transport);

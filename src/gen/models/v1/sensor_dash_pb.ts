@@ -4,15 +4,17 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
+import type { MetricType } from "./metric_type_dash_pb";
+import { file_models_v1_metric_type_dash } from "./metric_type_dash_pb";
+import type { Measurement } from "./measurement_dash_pb";
+import { file_models_v1_measurement_dash } from "./measurement_dash_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file models/v1/sensor_dash.proto.
  */
 export const file_models_v1_sensor_dash: GenFile = /*@__PURE__*/
-  fileDesc("Chttb2RlbHMvdjEvc2Vuc29yX2Rhc2gucHJvdG8SE2Rhc2hib2FyZC5tb2RlbHMudjEihQEKBlNlbnNvchIRCglzZW5zb3JfaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRjb2RlGAMgASgJEg4KBnN5bWJvbBgEIAEoCRIOCgZzdGF0dXMYBSABKAkSLAoHbWV0cmljcxgGIAMoCzIbLmRhc2hib2FyZC5tb2RlbHMudjEuTWV0cmljIlcKBk1ldHJpYxINCgV2YWx1ZRgBIAEoARIOCgZzeW1ib2wYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCOlo4Z2l0aHViLmNvbS9NZWRpU3RhdFRlY2gvZGFzaGJvYXJkLWNsaWVudC9wYi9nby9tb2RlbHMvdjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+  fileDesc("Chttb2RlbHMvdjEvc2Vuc29yX2Rhc2gucHJvdG8SE2Rhc2hib2FyZC5tb2RlbHMudjEixgEKBlNlbnNvchIRCglzZW5zb3JfaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRjb2RlGAMgASgJEg4KBnN5bWJvbBgEIAEoCRIOCgZzdGF0dXMYBSABKAkSNQoMbWV0cmljX3R5cGVzGAYgAygLMh8uZGFzaGJvYXJkLm1vZGVscy52MS5NZXRyaWNUeXBlEjYKDG1lYXN1cmVtZW50cxgHIAMoCzIgLmRhc2hib2FyZC5tb2RlbHMudjEuTWVhc3VyZW1lbnRCOlo4Z2l0aHViLmNvbS9NZWRpU3RhdFRlY2gvZGFzaGJvYXJkLWNsaWVudC9wYi9nby9tb2RlbHMvdjFiBnByb3RvMw", [file_models_v1_metric_type_dash, file_models_v1_measurement_dash]);
 
 /**
  * @generated from message dashboard.models.v1.Sensor
@@ -44,9 +46,14 @@ export type Sensor = Message<"dashboard.models.v1.Sensor"> & {
   status: string;
 
   /**
-   * @generated from field: repeated dashboard.models.v1.Metric metrics = 6;
+   * @generated from field: repeated dashboard.models.v1.MetricType metric_types = 6;
    */
-  metrics: Metric[];
+  metricTypes: MetricType[];
+
+  /**
+   * @generated from field: repeated dashboard.models.v1.Measurement measurements = 7;
+   */
+  measurements: Measurement[];
 };
 
 /**
@@ -55,31 +62,4 @@ export type Sensor = Message<"dashboard.models.v1.Sensor"> & {
  */
 export const SensorSchema: GenMessage<Sensor> = /*@__PURE__*/
   messageDesc(file_models_v1_sensor_dash, 0);
-
-/**
- * @generated from message dashboard.models.v1.Metric
- */
-export type Metric = Message<"dashboard.models.v1.Metric"> & {
-  /**
-   * @generated from field: double value = 1;
-   */
-  value: number;
-
-  /**
-   * @generated from field: string symbol = 2;
-   */
-  symbol: string;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 3;
-   */
-  createdAt?: Timestamp;
-};
-
-/**
- * Describes the message dashboard.models.v1.Metric.
- * Use `create(MetricSchema)` to create a new message.
- */
-export const MetricSchema: GenMessage<Metric> = /*@__PURE__*/
-  messageDesc(file_models_v1_sensor_dash, 1);
 

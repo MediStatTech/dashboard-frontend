@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { staffClient } from '../api/client';
 import type { Staff_Read } from '../gen/models/v1/staff_dash_pb';
 import { useLocale } from '../i18n/useLocale';
@@ -7,6 +7,7 @@ import icon from '../assets/medistat_icon_transparent.png';
 
 export default function TopBar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [staff, setStaff] = useState<Staff_Read | null>(null);
   const { lang, toggleLang } = useLocale();
 
@@ -16,20 +17,39 @@ export default function TopBar() {
     }).catch(() => {});
   }, []);
 
+  const isActive = (prefix: string) => location.pathname.startsWith(prefix);
+
+  const navBtnCls = (active: boolean) =>
+    `px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+      active
+        ? 'bg-green-600 text-white shadow-sm'
+        : 'text-green-700 hover:bg-green-50'
+    }`;
+
   return (
     <header className="bg-white/80 backdrop-blur-md border-b border-green-200 px-6 py-3 flex items-center justify-between shadow-sm">
-      <div
-        className="flex items-center gap-2.5 cursor-pointer group"
-        onClick={() => navigate('/patients')}
-      >
-        <img
-          src={icon}
-          alt="MediStat"
-          className="w-9 h-9 drop-shadow-md group-hover:scale-110 transition-transform duration-200"
-        />
-        <h1 className="text-xl font-bold bg-gradient-to-r from-green-700 to-green-500 bg-clip-text text-transparent">
-          MediStat
-        </h1>
+      <div className="flex items-center gap-6">
+        <div
+          className="flex items-center gap-2.5 cursor-pointer group"
+          onClick={() => navigate('/patients')}
+        >
+          <img
+            src={icon}
+            alt="MediStat"
+            className="w-9 h-9 drop-shadow-md group-hover:scale-110 transition-transform duration-200"
+          />
+          <h1 className="text-xl font-bold bg-gradient-to-r from-green-700 to-green-500 bg-clip-text text-transparent">
+            MediStat
+          </h1>
+        </div>
+        <nav className="flex items-center gap-1">
+          <button onClick={() => navigate('/patients')} className={navBtnCls(isActive('/patients'))}>
+            {lang === 'ua' ? 'Пацієнти' : 'Patients'}
+          </button>
+          <button onClick={() => navigate('/rooms')} className={navBtnCls(isActive('/rooms'))}>
+            {lang === 'ua' ? 'Палати' : 'Rooms'}
+          </button>
+        </nav>
       </div>
       <div className="flex items-center gap-3">
         <button

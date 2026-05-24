@@ -10,9 +10,12 @@ import {
   Tooltip,
 } from 'recharts';
 import TopBar from '../components/TopBar';
+import SensorHistoryModal from '../components/SensorHistoryModal';
 import { patientClient } from '../api/client';
 import type { Patient_Read } from '../gen/models/v1/patient_dash_pb';
+import type { Sensor } from '../gen/models/v1/sensor_dash_pb';
 import { useLocale } from '../i18n/useLocale';
+import { statusBadgeClasses, statusLabel } from '../utils/patientStatus';
 import mainBg from '../assets/main.png';
 
 const CHART_COLORS = [
@@ -22,12 +25,55 @@ const CHART_COLORS = [
   { stroke: '#2563eb', fill: '#bfdbfe' },
 ];
 
+const roundTo2 = (n: number) => Math.round(n * 100) / 100;
+
 export default function PatientDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t } = useLocale();
+  const { t, lang } = useLocale();
   const [patient, setPatient] = useState<Patient_Read | null>(null);
   const [error, setError] = useState('');
+  const [selectedSensor, setSelectedSensor] = useState<Sensor | null>(null);
+  const [panicUntil, setPanicUntil] = useState<number | null>(null);
+  const [panicLeft, setPanicLeft] = useState(0);
+  const [panicLoading, setPanicLoading] = useState(false);
+
+  useEffect(() => {
+    if (panicUntil === null) {
+      setPanicLeft(0);
+      return;
+    }
+    const tick = () => {
+      const left = Math.max(0, Math.round((panicUntil - Date.now()) / 1000));
+      setPanicLeft(left);
+      if (left <= 0) setPanicUntil(null);
+    };
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [panicUntil]);
+
+  const handlePanic = useCallback(async () => {
+    if (!patient || panicLoading || panicLeft > 0) return;
+    setPanicLoading(true);
+    try {
+      const reply = await patientClient.patientPanicTrigger({
+        patientId: patient.patientId,
+        durationSeconds: 60,
+      });
+      if (reply.panicUntil) {
+        const untilMs = Number(reply.panicUntil.seconds) * 1000;
+        setPanicUntil(untilMs);
+      } else {
+        setPanicUntil(Date.now() + 60_000);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to trigger panic';
+      setError(message);
+    } finally {
+      setPanicLoading(false);
+    }
+  }, [patient, panicLoading, panicLeft]);
 
   const fetchPatient = useCallback(async () => {
     if (!id) return;
@@ -92,15 +138,27 @@ export default function PatientDetailPage() {
                 {patient.firstName} {patient.lastName}
               </h2>
             </div>
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${
-                patient.status === 'active'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-yellow-100 text-yellow-700'
-              }`}
-            >
-              {patient.status}
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePanic}
+                disabled={panicLoading || panicLeft > 0}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all duration-150 ${
+                  panicLeft > 0
+                    ? 'bg-red-600 text-white cursor-not-allowed'
+                    : panicLoading
+                      ? 'bg-gray-200 text-gray-500 cursor-wait'
+                      : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 hover:border-red-300'
+                }`}
+                title={lang === 'ua' ? 'Симулювати критичний стан (60с)' : 'Simulate critical (60s)'}
+              >
+                {panicLeft > 0
+                  ? `🔥 ${lang === 'ua' ? 'Критично' : 'Critical'} ${panicLeft}s`
+                  : `🔥 ${lang === 'ua' ? 'Симулювати' : 'Simulate'}`}
+              </button>
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${statusBadgeClasses(patient.status)}`}>
+                {statusLabel(patient.status, lang)}
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-sm">
@@ -150,26 +208,74 @@ export default function PatientDetailPage() {
           </div>
         )}
 
+        {selectedSensor && patient && (
+          <SensorHistoryModal
+            open={!!selectedSensor}
+            onClose={() => setSelectedSensor(null)}
+            sensorId={selectedSensor.sensorId}
+            patientId={patient.patientId}
+            sensorName={selectedSensor.name}
+            metricTypes={selectedSensor.metricTypes}
+          />
+        )}
+
         {patient.sensors.length > 0 && (
           <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-5 border border-white/50">
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Sensors</h3>
             <div className="grid grid-cols-2 gap-4">
               {patient.sensors.map((s, idx) => {
-                const color = CHART_COLORS[idx % CHART_COLORS.length];
-                const chartData = [...s.metrics]
-                  .reverse()
-                  .map((m) => ({
+                const baseColor = CHART_COLORS[idx % CHART_COLORS.length];
+                const metricTypes = s.metricTypes ?? [];
+                const measurements = s.measurements ?? [];
+
+                const componentKeys = metricTypes.length > 0
+                  ? metricTypes.map((mt) => mt.code)
+                  : Array.from(
+                      new Set(
+                        measurements.flatMap((m) => m.components.map((c) => c.code))
+                      )
+                    );
+
+                const componentLabels: Record<string, { name: string; symbol: string }> = {};
+                metricTypes.forEach((mt) => {
+                  componentLabels[mt.code] = { name: mt.name || mt.code, symbol: mt.symbol };
+                });
+                measurements.forEach((m) => {
+                  m.components.forEach((c) => {
+                    if (!componentLabels[c.code]) {
+                      componentLabels[c.code] = { name: c.name || c.code, symbol: c.symbol };
+                    }
+                  });
+                });
+
+                const chartData = [...measurements].reverse().map((m) => {
+                  const entry: { time: string; [k: string]: string | number } = {
                     time: m.createdAt
                       ? new Date(Number(m.createdAt.seconds) * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                       : '',
-                    value: Math.round(m.value * 100) / 100,
-                  }));
-                const latest = s.metrics[0];
+                  };
+                  m.components.forEach((c) => {
+                    entry[c.code] = roundTo2(c.value);
+                  });
+                  return entry;
+                });
+
+                const latest = measurements[0];
+                const latestByCode: Record<string, number> = {};
+                latest?.components.forEach((c) => {
+                  latestByCode[c.code] = c.value;
+                });
+
+                const hasPair = componentKeys.length === 2 && latest !== undefined;
+                const primaryUnit = componentKeys.length > 0
+                  ? (componentLabels[componentKeys[0]]?.symbol ?? s.symbol)
+                  : s.symbol;
 
                 return (
                   <div
                     key={s.sensorId}
-                    className="bg-white/90 border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                    onClick={() => setSelectedSensor(s)}
+                    className="bg-white/90 border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-green-300 transition-all duration-200 cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-bold text-gray-800">
@@ -187,40 +293,85 @@ export default function PatientDetailPage() {
                     </div>
 
                     <div className="flex items-baseline gap-1.5 mb-3">
-                      {latest && (
-                        <span className="text-2xl font-bold" style={{ color: color.stroke }}>
-                          {(Math.round(latest.value * 100) / 100).toFixed(2)}
-                        </span>
+                      {latest && componentKeys.length > 0 ? (
+                        hasPair ? (
+                          <>
+                            <span className="text-2xl font-bold" style={{ color: baseColor.stroke }}>
+                              {componentKeys
+                                .map((k) => (latestByCode[k] !== undefined ? Math.round(latestByCode[k]).toString() : '—'))
+                                .join('/')}
+                            </span>
+                            <span className="text-xs text-gray-400 font-medium">{primaryUnit}</span>
+                          </>
+                        ) : (
+                          <div className="flex flex-wrap gap-3">
+                            {componentKeys.map((k) => (
+                              <div key={k} className="flex items-baseline gap-1.5">
+                                {componentKeys.length > 1 && (
+                                  <span className="text-xs text-gray-500 font-medium">
+                                    {componentLabels[k]?.name ?? k}:
+                                  </span>
+                                )}
+                                <span className="text-2xl font-bold" style={{ color: baseColor.stroke }}>
+                                  {latestByCode[k] !== undefined ? roundTo2(latestByCode[k]).toFixed(2) : '—'}
+                                </span>
+                                <span className="text-xs text-gray-400 font-medium">
+                                  {componentLabels[k]?.symbol ?? s.symbol}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      ) : (
+                        <span className="text-xs text-gray-400 italic">no data</span>
                       )}
-                      <span className="text-xs text-gray-400 font-medium">{s.symbol}</span>
                     </div>
 
-                    {chartData.length > 1 && (
+                    {chartData.length > 1 && componentKeys.length > 0 && (
                       <div className="h-28">
                         <ResponsiveContainer width="100%" height="100%">
                           <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
                             <defs>
-                              <linearGradient id={`grad-${s.sensorId}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={color.fill} stopOpacity={0.8} />
-                                <stop offset="100%" stopColor={color.fill} stopOpacity={0.1} />
-                              </linearGradient>
+                              {componentKeys.map((k, i) => {
+                                const c = CHART_COLORS[i % CHART_COLORS.length];
+                                return (
+                                  <linearGradient key={k} id={`grad-${s.sensorId}-${k}`} x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor={c.fill} stopOpacity={0.8} />
+                                    <stop offset="100%" stopColor={c.fill} stopOpacity={0.1} />
+                                  </linearGradient>
+                                );
+                              })}
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                             <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                             <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} domain={['dataMin - 5', 'dataMax + 5']} />
                             <Tooltip
                               contentStyle={{ borderRadius: '0.5rem', fontSize: '0.75rem', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                              formatter={(val: number) => [`${(Math.round(val * 100) / 100).toFixed(2)} ${s.symbol}`, s.name]}
+                              formatter={(val, name) => {
+                                const num = typeof val === 'number' ? val : Number(val ?? 0);
+                                const key = String(name);
+                                const label = componentLabels[key];
+                                const unit = label?.symbol ?? s.symbol;
+                                const displayName = label?.name ?? key;
+                                return [`${roundTo2(num).toFixed(2)} ${unit}`, displayName];
+                              }}
                             />
-                            <Area
-                              type="monotone"
-                              dataKey="value"
-                              stroke={color.stroke}
-                              strokeWidth={2}
-                              fill={`url(#grad-${s.sensorId})`}
-                              dot={{ r: 3, fill: color.stroke, strokeWidth: 0 }}
-                              activeDot={{ r: 5, fill: color.stroke, strokeWidth: 2, stroke: '#fff' }}
-                            />
+                            {componentKeys.map((k, i) => {
+                              const c = CHART_COLORS[i % CHART_COLORS.length];
+                              return (
+                                <Area
+                                  key={k}
+                                  type="monotone"
+                                  dataKey={k}
+                                  name={k}
+                                  stroke={c.stroke}
+                                  strokeWidth={2}
+                                  fill={`url(#grad-${s.sensorId}-${k})`}
+                                  dot={{ r: 2, fill: c.stroke, strokeWidth: 0 }}
+                                  activeDot={{ r: 4, fill: c.stroke, strokeWidth: 2, stroke: '#fff' }}
+                                />
+                              );
+                            })}
                           </AreaChart>
                         </ResponsiveContainer>
                       </div>

@@ -4,6 +4,8 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Patient_Create, Patient_ListItem, Patient_Read } from "../../models/v1/patient_dash_pb";
 import { file_models_v1_patient_dash } from "../../models/v1/patient_dash_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -12,13 +14,9 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file services/v1/patient_dash.proto.
  */
 export const file_services_v1_patient_dash: GenFile = /*@__PURE__*/
-  fileDesc("Ch5zZXJ2aWNlcy92MS9wYXRpZW50X2Rhc2gucHJvdG8SFWRhc2hib2FyZC5zZXJ2aWNlcy52MSITChFQYXRpZW50R2V0UmVxdWVzdCJKCg9QYXRpZW50R2V0UmVwbHkSNwoIcGF0aWVudHMYASADKAsyJS5kYXNoYm9hcmQubW9kZWxzLnYxLlBhdGllbnQuTGlzdEl0ZW0iLAoWUGF0aWVudFJldHJpZXZlUmVxdWVzdBISCgpwYXRpZW50X2lkGAEgASgJIkoKFFBhdGllbnRSZXRyaWV2ZVJlcGx5EjIKB3BhdGllbnQYASABKAsyIS5kYXNoYm9hcmQubW9kZWxzLnYxLlBhdGllbnQuUmVhZCJMChRQYXRpZW50Q3JlYXRlUmVxdWVzdBI0CgdwYXRpZW50GAEgASgLMiMuZGFzaGJvYXJkLm1vZGVscy52MS5QYXRpZW50LkNyZWF0ZSJIChJQYXRpZW50Q3JlYXRlUmVwbHkSMgoHcGF0aWVudBgBIAEoCzIhLmRhc2hib2FyZC5tb2RlbHMudjEuUGF0aWVudC5SZWFkMsgCCg5QYXRpZW50U2VydmljZRJeCgpQYXRpZW50R2V0EiguZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRHZXRSZXF1ZXN0GiYuZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRHZXRSZXBseRJtCg9QYXRpZW50UmV0cmlldmUSLS5kYXNoYm9hcmQuc2VydmljZXMudjEuUGF0aWVudFJldHJpZXZlUmVxdWVzdBorLmRhc2hib2FyZC5zZXJ2aWNlcy52MS5QYXRpZW50UmV0cmlldmVSZXBseRJnCg1QYXRpZW50Q3JlYXRlEisuZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRDcmVhdGVSZXF1ZXN0GikuZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRDcmVhdGVSZXBseUI8WjpnaXRodWIuY29tL01lZGlTdGF0VGVjaC9kYXNoYm9hcmQtY2xpZW50L3BiL2dvL3NlcnZpY2VzL3YxYgZwcm90bzM", [file_models_v1_patient_dash]);
+  fileDesc("Ch5zZXJ2aWNlcy92MS9wYXRpZW50X2Rhc2gucHJvdG8SFWRhc2hib2FyZC5zZXJ2aWNlcy52MSITChFQYXRpZW50R2V0UmVxdWVzdCJKCg9QYXRpZW50R2V0UmVwbHkSNwoIcGF0aWVudHMYASADKAsyJS5kYXNoYm9hcmQubW9kZWxzLnYxLlBhdGllbnQuTGlzdEl0ZW0iLAoWUGF0aWVudFJldHJpZXZlUmVxdWVzdBISCgpwYXRpZW50X2lkGAEgASgJIkoKFFBhdGllbnRSZXRyaWV2ZVJlcGx5EjIKB3BhdGllbnQYASABKAsyIS5kYXNoYm9hcmQubW9kZWxzLnYxLlBhdGllbnQuUmVhZCJMChRQYXRpZW50Q3JlYXRlUmVxdWVzdBI0CgdwYXRpZW50GAEgASgLMiMuZGFzaGJvYXJkLm1vZGVscy52MS5QYXRpZW50LkNyZWF0ZSJIChJQYXRpZW50Q3JlYXRlUmVwbHkSMgoHcGF0aWVudBgBIAEoCzIhLmRhc2hib2FyZC5tb2RlbHMudjEuUGF0aWVudC5SZWFkIkoKGlBhdGllbnRQYW5pY1RyaWdnZXJSZXF1ZXN0EhIKCnBhdGllbnRfaWQYASABKAkSGAoQZHVyYXRpb25fc2Vjb25kcxgCIAEoBSJLChhQYXRpZW50UGFuaWNUcmlnZ2VyUmVwbHkSLwoLcGFuaWNfdW50aWwYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wMsMDCg5QYXRpZW50U2VydmljZRJeCgpQYXRpZW50R2V0EiguZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRHZXRSZXF1ZXN0GiYuZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRHZXRSZXBseRJtCg9QYXRpZW50UmV0cmlldmUSLS5kYXNoYm9hcmQuc2VydmljZXMudjEuUGF0aWVudFJldHJpZXZlUmVxdWVzdBorLmRhc2hib2FyZC5zZXJ2aWNlcy52MS5QYXRpZW50UmV0cmlldmVSZXBseRJnCg1QYXRpZW50Q3JlYXRlEisuZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRDcmVhdGVSZXF1ZXN0GikuZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRDcmVhdGVSZXBseRJ5ChNQYXRpZW50UGFuaWNUcmlnZ2VyEjEuZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRQYW5pY1RyaWdnZXJSZXF1ZXN0Gi8uZGFzaGJvYXJkLnNlcnZpY2VzLnYxLlBhdGllbnRQYW5pY1RyaWdnZXJSZXBseUI8WjpnaXRodWIuY29tL01lZGlTdGF0VGVjaC9kYXNoYm9hcmQtY2xpZW50L3BiL2dvL3NlcnZpY2VzL3YxYgZwcm90bzM", [file_google_protobuf_timestamp, file_models_v1_patient_dash]);
 
 /**
- * =====================
- * PatientGet
- * =====================
- *
  * @generated from message dashboard.services.v1.PatientGetRequest
  */
 export type PatientGetRequest = Message<"dashboard.services.v1.PatientGetRequest"> & {
@@ -49,10 +47,6 @@ export const PatientGetReplySchema: GenMessage<PatientGetReply> = /*@__PURE__*/
   messageDesc(file_services_v1_patient_dash, 1);
 
 /**
- * =====================
- * PatientRetrieve
- * =====================
- *
  * @generated from message dashboard.services.v1.PatientRetrieveRequest
  */
 export type PatientRetrieveRequest = Message<"dashboard.services.v1.PatientRetrieveRequest"> & {
@@ -87,10 +81,6 @@ export const PatientRetrieveReplySchema: GenMessage<PatientRetrieveReply> = /*@_
   messageDesc(file_services_v1_patient_dash, 3);
 
 /**
- * =====================
- * PatientCreate
- * =====================
- *
  * @generated from message dashboard.services.v1.PatientCreateRequest
  */
 export type PatientCreateRequest = Message<"dashboard.services.v1.PatientCreateRequest"> & {
@@ -125,10 +115,45 @@ export const PatientCreateReplySchema: GenMessage<PatientCreateReply> = /*@__PUR
   messageDesc(file_services_v1_patient_dash, 5);
 
 /**
- * =====================
- * PatientService
- * =====================
- *
+ * @generated from message dashboard.services.v1.PatientPanicTriggerRequest
+ */
+export type PatientPanicTriggerRequest = Message<"dashboard.services.v1.PatientPanicTriggerRequest"> & {
+  /**
+   * @generated from field: string patient_id = 1;
+   */
+  patientId: string;
+
+  /**
+   * @generated from field: int32 duration_seconds = 2;
+   */
+  durationSeconds: number;
+};
+
+/**
+ * Describes the message dashboard.services.v1.PatientPanicTriggerRequest.
+ * Use `create(PatientPanicTriggerRequestSchema)` to create a new message.
+ */
+export const PatientPanicTriggerRequestSchema: GenMessage<PatientPanicTriggerRequest> = /*@__PURE__*/
+  messageDesc(file_services_v1_patient_dash, 6);
+
+/**
+ * @generated from message dashboard.services.v1.PatientPanicTriggerReply
+ */
+export type PatientPanicTriggerReply = Message<"dashboard.services.v1.PatientPanicTriggerReply"> & {
+  /**
+   * @generated from field: google.protobuf.Timestamp panic_until = 1;
+   */
+  panicUntil?: Timestamp;
+};
+
+/**
+ * Describes the message dashboard.services.v1.PatientPanicTriggerReply.
+ * Use `create(PatientPanicTriggerReplySchema)` to create a new message.
+ */
+export const PatientPanicTriggerReplySchema: GenMessage<PatientPanicTriggerReply> = /*@__PURE__*/
+  messageDesc(file_services_v1_patient_dash, 7);
+
+/**
  * @generated from service dashboard.services.v1.PatientService
  */
 export const PatientService: GenService<{
@@ -155,6 +180,14 @@ export const PatientService: GenService<{
     methodKind: "unary";
     input: typeof PatientCreateRequestSchema;
     output: typeof PatientCreateReplySchema;
+  },
+  /**
+   * @generated from rpc dashboard.services.v1.PatientService.PatientPanicTrigger
+   */
+  patientPanicTrigger: {
+    methodKind: "unary";
+    input: typeof PatientPanicTriggerRequestSchema;
+    output: typeof PatientPanicTriggerReplySchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_services_v1_patient_dash, 0);
